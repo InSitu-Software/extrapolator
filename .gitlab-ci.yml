@@ -1,0 +1,13 @@
+image: golang:1:12-alpine
+
+stages:
+  - build
+
+build:go:
+  stage: go_build
+  script:
+    - apk --no-cache -q add git make build-base
+    - make all
+  artifacts:
+    paths:
+      - build
