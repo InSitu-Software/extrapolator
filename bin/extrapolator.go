@@ -70,6 +70,12 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		if len(list) == 0 {
+			if maxVersion, err = semver.NewVersion("0.0.0"); err != nil {
+				log.Fatal(err)
+			}
+			break
+		}
 		maxVersion = list[len(list)-1]
 
 	default:
@@ -89,7 +95,7 @@ func main() {
 		newVersion = *maxVersion
 	}
 
-	// version srting preparation
+	// version string preparation
 	var newVersionString string
 	switch {
 	case viper.GetBool("suffix"):
