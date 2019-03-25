@@ -5,6 +5,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	plumberSSH "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 	"io/ioutil"
@@ -109,7 +110,7 @@ func GetListByRemote(remote, key, user, password string) (versionList semver.Col
 
 		cloneOptions.Auth = &plumberSSH.PublicKeys{User: user, Signer: signer}
 	case password != "":
-		log.Fatal("not implemented")
+		cloneOptions.Auth = &http.BasicAuth{Username: user, Password: password}
 	case user != "git":
 		log.Fatal("not implemented")
 	}
