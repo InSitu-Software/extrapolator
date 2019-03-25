@@ -34,7 +34,7 @@ func init() {
 	pflag.String("prefix-tag", "v", "prefix to be added")
 
 	// define actions
-	pflag.Bool("git-tag", false, "add git tag to current commit")
+	pflag.Bool("git-tag", false, "add git tag to current commit (works only on local repositories")
 
 	// output options
 	pflag.BoolP("minimal", "m", false, "minimal output - only print new version string")
@@ -117,7 +117,7 @@ func main() {
 	}
 
 	// create git tag
-	if viper.GetBool("git-tag") {
+	if viper.GetBool("git-tag") && viper.GetString("repository") != "" {
 		err := gitextract.Tag(viper.GetString("repository"), newVersionString, viper.GetString("branch"))
 		if err != nil {
 			log.Fatal(err)
