@@ -13,8 +13,14 @@ import (
 func init() {
 	// define data source
 	pflag.StringP("repository", "r", "", "use git repository as source")
+	pflag.String("repository-remote", "", "use a not cloned repository")
 	pflag.StringP("branch", "b", "master", "branch to be used for commit and tag")
 	pflag.StringP("original-version", "v", "", "use given version as source")
+
+	// define auth for repository-remote if necessary
+	pflag.String("remote-ssh", "", "ssh key to be used for auth")
+	pflag.String("remote-user", "git", "user to be used for auth")
+	pflag.String("remote-password", "", "password to be used for auth")
 
 	// define output
 	pflag.Bool("major", false, "increment major version")
@@ -39,7 +45,9 @@ func init() {
 		log.Fatal(err)
 	}
 
-	if viper.GetString("repository") != "" && viper.GetString("original-version") != "" {
+	if viper.GetString("repository") != "" &&
+		viper.GetString("original-version") != "" &&
+		viper.GetString("repository-remote") == "" {
 		log.Fatal("please use original-version OR repository as source")
 	}
 
@@ -58,28 +66,24 @@ func init() {
 func main() {
 	// get latest version
 	var maxVersion *semver.Version
+	var err error
 	switch {
 	case viper.GetString("original-version") != "":
-		v, err := semver.NewVersion(viper.GetString("original-version"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		maxVersion = v
+		maxVersion, err = semver.NewVersion(viper.GetString("original-version"))
 	case viper.GetString("repository") != "":
-		list, err := gitextract.GetList(viper.GetString("repository"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		if len(list) == 0 {
-			if maxVersion, err = semver.NewVersion("0.0.0"); err != nil {
-				log.Fatal(err)
-			}
-			break
-		}
-		maxVersion = list[len(list)-1]
-
+		maxVersion, err = gitextract.GetMaxVersionByLocal(viper.GetString("repository"))
+	case viper.GetString("repository-remote") != "":
+		maxVersion, err = gitextract.GetMaxVersionByRemote(
+			viper.GetString("repository-remote"),
+			viper.GetString("remote-ssh"),
+			viper.GetString("remote-user"),
+			viper.GetString("remote-password"),
+		)
 	default:
 		log.Fatal("missing datasource")
+	}
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// generate new version
