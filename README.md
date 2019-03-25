@@ -1,10 +1,10 @@
 # Extrapolator
 Extrapolator provides a go-only helper tool for version / version tag handling, similar to `npm version` or `yarn version`. 
 
-Many thanks to [SemVer](github.com/Masterminds/semver) and [go-git](github.com/src-d/go-git). 
+Many thanks to [SemVer](//github.com/Masterminds/semver) and [go-git](//github.com/src-d/go-git). 
 
 ## Intentions
-We needed / wanted the functionality of `npm/yarn version` in out CI/CD go-builds and without the need of adding more dependencies to the build environment. 
+We needed / wanted the functionality of `npm/yarn version` in our CI/CD go-builds and without the need of adding more dependencies to the build environment. 
 
 # Usage
 
