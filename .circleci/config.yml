@@ -1,23 +1,50 @@
 version: 2.1
-orbs:
-  aws-ecr: circleci/aws-ecr@6.12.2
-
 jobs:
-  build:
-    machine:
-      image: ubuntu-1604:202007-01
+  build_linux:
+    docker:
+      - image: circleci/golang:1.12
+
+    working_directory: /go/src/github.com/InSitu-Software/extrapolator
     steps:
-      - aws-ecr/build-and-push-image:
-          account-url: AWS_ECR_ACCOUNT_URL
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          no-output-timeout: 20m
-          region: AWS_REGION
-          repo: extrapolator
-          tag: '$CIRCLE_SHA1,$CIRCLE_BRANCH'
+      - checkout
+      - run: env GO111MODULE=on GOOS=linux GOARH=amd64 go build -a -o ./build/linux/extrapolator bin/extrapolator.go
+      - store_artifacts:
+          path: build
+    
+  build_freebsd:
+    docker:
+      - image: circleci/golang:1.12
+
+    working_directory: /go/src/github.com/InSitu-Software/extrapolator
+    steps:
+      - checkout
+      - run: env GO111MODULE=on GOOS=freebsd GOARH=amd64 go build -a -o ./build/freebsd/extrapolator bin/extrapolator.go
+      - store_artifacts:
+          path: build
+
+  build_darwin:
+    docker:
+      - image: circleci/golang:1.12
+
+    working_directory: /go/src/github.com/InSitu-Software/extrapolator
+    steps:
+      - checkout
+      - run: env GO111MODULE=on GOOS=darwin GOARH=amd64 go build -a -o ./build/darwin/extrapolator bin/extrapolator.go
+      - store_artifacts:
+          path: build
 
 workflows:
-  build:
+  build_binaries:
     jobs:
-      - build:
-          context: Insitu_AWS
+      - build_linux:
+          filters:
+            branches:
+              only: master
+      - build_freebsd:
+          filters:
+            branches:
+              only: master      
+      - build_darwin:
+          filters:
+            branches:
+              only: master
