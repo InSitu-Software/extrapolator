@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.12.2
+  
 jobs:
   build_linux:
     docker:
@@ -32,6 +35,23 @@ jobs:
       - run: env GO111MODULE=on GOOS=darwin GOARH=amd64 go build -a -o ./build/darwin/extrapolator bin/extrapolator.go
       - store_artifacts:
           path: build
+          
+  build_and_push_docker:
+    machine:
+      image: ubuntu-1604:202007-01
+    working_directory: ~/go/src/github.com/InSitu-Software/checked
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - aws-ecr/build-and-push-image:
+          account-url: AWS_ECR_ACCOUNT_URL
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          no-output-timeout: 20m
+          region: AWS_REGION
+          repo: extrapolator
+          tag: '$CIRCLE_SHA1,$CIRCLE_BRANCH
 
 workflows:
   build_binaries:
@@ -48,3 +68,7 @@ workflows:
           filters:
             branches:
               only: master
+  build_docker:
+    jobs:
+      - build_and_push_docker:
+          type: approval
