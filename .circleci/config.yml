@@ -47,7 +47,7 @@ jobs:
           no-output-timeout: 20m
           region: AWS_REGION
           repo: extrapolator
-          tag: '$CIRCLE_SHA1,$CIRCLE_BRANCH
+          tag: '$CIRCLE_SHA1,$CIRCLE_BRANCH'
 
 workflows:
   build_binaries:
