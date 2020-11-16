@@ -67,7 +67,7 @@ workflows:
   build_docker:
     jobs:
       - hold:
-          type:approval
+          type: approval
       - build_and_push_docker:
           requires:
             - hold 
