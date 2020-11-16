@@ -66,6 +66,9 @@ workflows:
               only: master
   build_docker:
     jobs:
+      - hold:
+          type:approval
       - build_and_push_docker:
-          type: approval
+          requires:
+            - hold 
           context: Insitu_AWS
