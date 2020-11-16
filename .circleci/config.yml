@@ -68,6 +68,4 @@ workflows:
     jobs:
       - build_and_push_docker:
           type: approval
-          requires:
-            - hold
           context: Insitu_AWS
